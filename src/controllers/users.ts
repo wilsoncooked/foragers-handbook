@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { prisma } from "../../prisma/client";
+import { prisma } from "../config/prismaClient";
 
 const router = express.Router();
 
@@ -9,9 +9,11 @@ router.get("/", async (req: Request, res: Response) => {
     const users = await prisma.user.findMany();
     res.json(
       users.map((user) => ({
+        id: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        password: user.password,
       }))
     );
   } catch (error) {
@@ -23,9 +25,9 @@ router.get("/", async (req: Request, res: Response) => {
 // POST /user
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const { firstName, lastName, email } = req.body;
+    const { firstName, lastName, email, password } = req.body;
     const user = await prisma.user.create({
-      data: { firstName, lastName, email },
+      data: { firstName, lastName, email, password },
     });
     res.status(201).json(user);
   } catch (error) {

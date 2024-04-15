@@ -19,6 +19,3 @@ dist/
 # Miscellaneous
 .DS_Store
 Thumbs.db
-
-# Prisma
-src/prisma/migrations/

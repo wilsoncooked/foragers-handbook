@@ -3,13 +3,15 @@ import express from "express";
 import bodyParser from "body-parser";
 import { Request, Response } from "express";
 import { port } from "./config";
-import usersRoutes from "./api/routes/users.routes";
+import userController from "./controllers/users";
 
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use("/user", usersRoutes);
+
+// Controllers (route handlers)
+app.use("/user", userController);
 
 app.get("/", async (req: Request, res: Response) => {
   res.status(200).json({

@@ -8,10 +8,9 @@
     "dev": "nodemon  src/index.ts",
     "build": "tsc -p .",
     "lint": "tslint -c tslint.json -p tsconfig.json --fix",
-    "prisma:generate": "prisma generate"
-  },
-  "prisma": {
-    "schema": "src/prisma/schema.prisma"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate-create": "prisma migrate dev --create-only"
   },
   "author": "wilsoncooked",
   "license": "ISC",
