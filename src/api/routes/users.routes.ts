@@ -1,26 +1,36 @@
-import express, { Request, Response } from 'express';
-import User from '../../database/models/user';
+import express, { Request, Response } from "express";
+import { prisma } from "../../prisma/client";
+
 const router = express.Router();
 
-// GET /users
-router.get('/', async (req: Request, res: Response) => {
+// GET /user
+router.get("/", async (req: Request, res: Response) => {
   try {
-    const users = await User.findAll();
-    res.json(users);
+    const users = await prisma.user.findMany();
+    res.json(
+      users.map((user) => ({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      }))
+    );
   } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Unable to fetch users' });
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Unable to fetch users" });
   }
 });
 
-// POST /users
-router.post('/', async (req: Request, res: Response) => {
+// POST /user
+router.post("/", async (req: Request, res: Response) => {
   try {
-    const user = await User.create(req.body);
-    res.json(user);
+    const { firstName, lastName, email } = req.body;
+    const user = await prisma.user.create({
+      data: { firstName, lastName, email },
+    });
+    res.status(201).json(user);
   } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Unable to create user' });
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: "Unable to create user" });
   }
 });
 

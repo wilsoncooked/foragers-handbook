@@ -1,24 +1,21 @@
-import http from 'http';
-import express from 'express';
-import bodyParser from 'body-parser';
-import { Request, Response } from 'express';
-import { port } from './config';
-import usersRoutes from './api/routes/users.routes';
-import dbInit from './database/init';
+import http from "http";
+import express from "express";
+import bodyParser from "body-parser";
+import { Request, Response } from "express";
+import { port } from "./config";
+import usersRoutes from "./api/routes/users.routes";
 
-dbInit(); // Initialize the database
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/users', usersRoutes);
+app.use("/user", usersRoutes);
 
-app.get('/', async (req: Request, res: Response) => {
+app.get("/", async (req: Request, res: Response) => {
   res.status(200).json({
-    message: 'Hello World'
+    message: "Hello World",
   });
 });
-
 
 const server = http.createServer(app);
 
