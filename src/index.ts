@@ -2,8 +2,11 @@ import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
 import { Request, Response } from "express";
+import * as dotenv from "dotenv";
 import { port } from "./config";
 import userController from "./controllers/users";
+
+dotenv.config();
 
 const app = express();
 

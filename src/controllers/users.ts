@@ -1,5 +1,7 @@
 import express, { Request, Response } from "express";
 import { prisma } from "../config/prismaClient";
+import { comparePasswords, hashPassword } from "../utils/password";
+import { generateToken } from "../utils/token";
 
 const router = express.Router();
 
@@ -13,7 +15,6 @@ router.get("/", async (req: Request, res: Response) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        password: user.password,
       }))
     );
   } catch (error) {
@@ -26,13 +27,62 @@ router.get("/", async (req: Request, res: Response) => {
 router.post("/", async (req: Request, res: Response) => {
   try {
     const { firstName, lastName, email, password } = req.body;
+    const hashedPassword = await hashPassword(password);
     const user = await prisma.user.create({
-      data: { firstName, lastName, email, password },
+      data: {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+      },
     });
     res.status(201).json(user);
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ error: "Unable to create user" });
+  }
+});
+
+// DELETE /user/:id
+router.delete("/:id", async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    await prisma.user.delete({
+      where: { id },
+    });
+    res.status(204).end();
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Unable to delete user" });
+  }
+});
+
+// POST /user/login
+router.post("/login", async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    console.log(email);
+
+    // Find user by email
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Compare passwords
+    const passwordMatch = await comparePasswords(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    // Generate JWT
+    const token = generateToken(user.id);
+
+    res.json({ token });
+  } catch (error) {
+    console.error("Error logging in:", error);
+    res.status(500).json({ error: "Unable to log in" });
   }
 });
 
